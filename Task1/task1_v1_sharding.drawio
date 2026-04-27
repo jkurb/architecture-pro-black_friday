@@ -1,0 +1,44 @@
+<mxfile host="65bd71144e">
+    <diagram name="V1-Sharding" id="v1-sharding">
+        <mxGraphModel dx="1034" dy="711" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Вариант 1 — Шардирование (2 шарда)" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="30" width="560" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="app" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="400" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="mongos" value="mongos&#xa;(router)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="340" y="400" width="160" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfg" value="configSrv" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="375" y="130" width="90" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1" value="shard1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="310" width="120" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2" value="shard2" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="520" width="120" height="100" as="geometry"/>
+                </mxCell>
+                <!-- Legend: collections -->
+                <mxCell id="legend" value="&lt;b&gt;Шардируемые коллекции:&lt;/b&gt;&lt;br&gt;orders → { user_id: &quot;hashed&quot; }&lt;br&gt;users → { _id: &quot;hashed&quot; }&lt;br&gt;&lt;br&gt;&lt;i&gt;products — не шардируется&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=top;fontSize=11;fillColor=#ffffc0;strokeColor=#888800;rounded=1;spacingLeft=6;spacingRight=6;spacingTop=4;" parent="1" vertex="1">
+                    <mxGeometry x="800" y="310" width="260" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_app_mongos" value="read / write&#xa;(MongoDB protocol)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="app" target="mongos" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_cfg" value="routing metadata&#xa;(cluster topology)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="mongos" target="cfg" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_s1" value="write chunk&#xa;(orders, users)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="mongos" target="s1" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_s2" value="write chunk&#xa;(orders, users)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="mongos" target="s2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

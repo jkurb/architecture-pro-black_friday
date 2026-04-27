@@ -1,0 +1,137 @@
+<mxfile host="65bd71144e">
+    <diagram name="V3-Cache" id="v3-cache">
+        <mxGraphModel dx="3394" dy="1138" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="820" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Вариант 3 — Шардирование + Репликация + Redis-кэш" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="300" y="20" width="720" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="app" value="pymongo-api" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="400" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="redis" value="redis&#xa;(cache)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5b7b1;strokeColor=#922b21;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="210" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="mongos" value="mongos&#xa;(router)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="290" y="415" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="cfg" value="configSrv" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="315" y="135" width="80" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="rs1" value="Replica Set: shard1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b85450;dashed=1;verticalAlign=top;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="265" width="680" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1-1" value="shard1-1&#xa;(primary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="300" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1-2" value="shard1-2&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fad7ac;strokeColor=#b46504;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="300" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1-3" value="shard1-3&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fad7ac;strokeColor=#b46504;" parent="1" vertex="1">
+                    <mxGeometry x="1030" y="300" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="rs2" value="Replica Set: shard2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b85450;dashed=1;verticalAlign=top;fontStyle=1;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="525" width="690" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2-1" value="shard2-1&#xa;(primary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="560" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2-2" value="shard2-2&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fad7ac;strokeColor=#b46504;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="560" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2-3" value="shard2-3&#xa;(secondary)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#fad7ac;strokeColor=#b46504;" parent="1" vertex="1">
+                    <mxGeometry x="1030" y="560" width="100" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_app_redis" value="cache GET (key lookup)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=classicThin;fontSize=10;strokeColor=#922b21;" edge="1" parent="1" source="app" target="redis">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_redis_app" value="cache hit / miss (TTL 60s)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;fontSize=10;strokeColor=#922b21;" edge="1" parent="1" source="redis" target="app">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="20" y="240"/>
+                            <mxPoint x="20" y="430"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_app_mongos" value="read / write&#xa;(cache miss only)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="app" target="mongos" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_cfg" value="routing metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;" parent="1" source="mongos" target="cfg" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_s1" value="write (primary)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.2;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;strokeColor=#b85450;" edge="1" parent="1" source="mongos" target="s1-1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_s2" value="write (primary)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=classicThin;startArrow=classicThin;fontSize=10;strokeColor=#b85450;" edge="1" parent="1" source="mongos" target="s2-1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_mongos_s1_2_read" value="read (secondaryPreferred)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.75;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classicThin;dashed=1;fontSize=10;strokeColor=#b46504;" edge="1" parent="1" source="mongos" target="s1-2">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="387" y="240"/>
+                            <mxPoint x="820" y="240"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_mongos_s1_3_read" value="read (secondaryPreferred)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.9;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classicThin;dashed=1;fontSize=10;strokeColor=#b46504;" edge="1" parent="1" source="mongos" target="s1-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="407" y="220"/>
+                            <mxPoint x="1080" y="220"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_mongos_s2_2_read" value="read (secondaryPreferred)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classicThin;dashed=1;fontSize=10;strokeColor=#b46504;" edge="1" parent="1" source="mongos" target="s2-2">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="387" y="500"/>
+                            <mxPoint x="820" y="500"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e_mongos_s2_3_read" value="read (secondaryPreferred)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classicThin;dashed=1;fontSize=10;strokeColor=#b46504;" edge="1" parent="1" source="mongos" target="s2-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="407" y="512"/>
+                            <mxPoint x="1080" y="512"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="repl_s1_12" value="oplog replication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;startArrow=open;fontSize=10;strokeColor=#b46504;" parent="1" source="s1-1" target="s1-2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="repl_s1_23" value="oplog replication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;startArrow=open;fontSize=10;strokeColor=#b46504;" parent="1" source="s1-2" target="s1-3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="hb_s1" value="heartbeat / election" style="endArrow=open;startArrow=open;html=1;rounded=0;fontSize=10;strokeColor=#b46504;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="s1-1" target="s1-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="580" y="465"/>
+                            <mxPoint x="1080" y="465"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="repl_s2_12" value="oplog replication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;startArrow=open;fontSize=10;strokeColor=#b46504;" parent="1" source="s2-1" target="s2-2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="repl_s2_23" value="oplog replication" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;startArrow=open;fontSize=10;strokeColor=#b46504;" parent="1" source="s2-2" target="s2-3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="hb_s2" value="heartbeat / election" style="endArrow=open;startArrow=open;html=1;rounded=0;fontSize=10;strokeColor=#b46504;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="s2-1" target="s2-3">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="580" y="725"/>
+                            <mxPoint x="1080" y="725"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+
+                <!-- Legend: collections -->
+                <mxCell id="legend" value="&lt;b&gt;Шардируемые коллекции:&lt;/b&gt;&lt;br&gt;orders → { user_id: &quot;hashed&quot; }&lt;br&gt;users → { _id: &quot;hashed&quot; }&lt;br&gt;&lt;br&gt;&lt;i&gt;products — не шардируется&lt;/i&gt;" style="text;html=1;align=left;verticalAlign=top;fontSize=11;fillColor=#ffffc0;strokeColor=#888800;rounded=1;spacingLeft=6;spacingRight=6;spacingTop=4;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="620" width="240" height="90" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
