@@ -106,3 +106,69 @@ sh.shardCollection("somedb.users", { "_id": "hashed" })
 Шардирование это не решает — все запросы к одному товару всё равно идут на один шард.
 Redis отвечает за микросекунды и полностью снимает нагрузку с MongoDB для read-heavy коллекций.
 
+---
+
+## Вариант 4 — API Gateway, Consul, горизонтальное масштабирование
+
+**Файл схемы:** `task1_v4_scaling.drawio`
+
+Один инстанс приложения — это SPOF. Решение: запустить несколько `pymongo-api`, поставить
+перед ними балансировщик (API Gateway), и научить Gateway автоматически узнавать о новых/упавших
+инстансах через Service Discovery.
+
+### Новые компоненты
+
+| Сервис | Тип | Роль |
+|---|---|---|
+| `API Gateway` | nginx / Traefik | принимает HTTPS-трафик от клиентов, балансирует на app-инстансы |
+| `Consul` (3 ноды) | Hashicorp Consul | Service Discovery, реплицирует данные через Raft (кворум 2/3) |
+| `pymongo-api-1`, `-2`, `-3` | FastAPI | stateless-инстансы приложения |
+
+### Поток регистрации и обнаружения сервисов
+
+```
+1. pymongo-api-N стартует
+        ↓
+2. POST в Consul: "я pymongo-api на 10.0.0.X:8080, healthy"
+        ↓
+3. Consul реплицирует регистрацию через Raft на все 3 ноды
+        ↓
+4. API Gateway периодически (или через DNS) спрашивает Consul:
+   "дай мне всех pymongo-api"
+        ↓
+5. Gateway получает актуальный список → перестраивает upstream pool
+        ↓
+6. Если инстанс падает / heartbeat пропадает → Consul помечает unhealthy
+        → Gateway убирает его из балансировки
+```
+
+### Сетевые взаимодействия
+
+| Стрелка | Протокол / детали |
+|---|---|
+| `Клиент → API Gateway` | HTTPS (443) или HTTP (8080) |
+| `API Gateway → Consul` | Service discovery (HTTP API или DNS) |
+| `API Gateway → pymongo-api-N` | Балансировка LB: round-robin / least-conn |
+| `pymongo-api-N → Consul` | register + heartbeat (раз в 10 сек) |
+| `consul ↔ consul` | Raft replication (метаданные сервисов) |
+| `pymongo-api-N → redis` | cache GET/SET |
+| `pymongo-api-N → mongos` | MongoDB queries (как раньше) |
+
+### Что это даёт
+
+| Проблема | Решение |
+|---|---|
+| Падение одного инстанса = простой | LB убирает unhealthy инстанс, остальные обслуживают трафик |
+| Деплой без даунтайма | Поднимаем новый инстанс → регистрируется в Consul → Gateway добавляет его. Затем останавливаем старый |
+| Не справляется с нагрузкой | Запускаем `docker compose up -d --scale pymongo_api=N` (или k8s scale) |
+| Конфигурация LB вручную | Не нужна — Gateway узнаёт об инстансах автоматически |
+
+### Почему именно 3 ноды Consul
+
+Consul использует Raft для согласованности. Кворум `⌈N/2⌉ + 1`:
+- 1 нода → нет fault tolerance
+- 3 ноды → переживают падение 1 ноды (кворум 2/3)
+- 5 нод → переживают падение 2 нод (кворум 3/5)
+
+3 — стандартный production-минимум.
+
